@@ -8,7 +8,7 @@
 | 03 | Firebase Services | ✅ Done |
 | 04 | Authentication | ✅ Done |
 | 05 | Routing and Layout | ✅ Done |
-| 06 | Theme and Dark Mode | ⬜ Pending |
+| 06 | Theme and Dark Mode | ✅ Done |
 | 07 | Exercise Library (Admin) | ⬜ Pending |
 | 08 | Training Plans (Admin) | ⬜ Pending |
 | 09 | Trainee Exercises and Custom Plans | ⬜ Pending |

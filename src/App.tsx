@@ -15,6 +15,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminExerciseTypesPage from './pages/admin/AdminExerciseTypesPage';
 import AdminExercisesPage from './pages/admin/AdminExercisesPage';
 import AdminPlansPage from './pages/admin/AdminPlansPage';
+import AdminExerciseFormPage from './pages/admin/AdminExerciseFormPage';
 import { Box, CircularProgress } from '@mui/material';
 
 function AppRoutes() {
@@ -70,6 +71,8 @@ function AppRoutes() {
         { path: '/admin', element: <AdminDashboardPage /> },
         { path: '/admin/exercise-types', element: <AdminExerciseTypesPage /> },
         { path: '/admin/exercises', element: <AdminExercisesPage /> },
+        { path: '/admin/exercises/new', element: <AdminExerciseFormPage /> },
+        { path: '/admin/exercises/:id', element: <AdminExerciseFormPage /> },
         { path: '/admin/plans', element: <AdminPlansPage /> },
       ].map(({ path, element }) => (
         <Route
