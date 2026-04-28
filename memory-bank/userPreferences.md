@@ -16,7 +16,8 @@ can be quickly re-confirmed at the start of a new session.
 ## Preferences
 - After each completed step: update `memory-bank/activeContext.md` and `memory-bank/progress.md`, and store key facts with `store_memory`
 - Commit after each step is fully verified (build passes)
-- Use conventional, descriptive commit messages with the Copilot co-author trailer
+- No Co-authored-by trailer in commits — user is the sole author
+- Use conventional, descriptive commit messages
 - Follow the prompt files in `.github/prompts/` step by step (01 → 15)
 - Do not skip steps or combine steps unless explicitly asked
 
