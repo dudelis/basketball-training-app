@@ -9,7 +9,7 @@
 | 04 | Authentication | ✅ Done |
 | 05 | Routing and Layout | ✅ Done |
 | 06 | Theme and Dark Mode | ✅ Done |
-| 07 | Exercise Library (Admin) | ⬜ Pending |
+| 07 | Exercise Library (Admin) | ✅ Done |
 | 08 | Training Plans (Admin) | ⬜ Pending |
 | 09 | Trainee Exercises and Custom Plans | ⬜ Pending |
 | 10 | Timer System | ⬜ Pending |
