@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -21,11 +20,10 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import type { ReactNode } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
+import { useThemeContext } from '../contexts/ThemeContext';
 
 type Props = {
   children: ReactNode;
-  onToggleTheme?: () => void;
-  isDarkMode?: boolean;
 };
 
 const NAV_ITEMS = [
@@ -42,8 +40,9 @@ const ADMIN_NAV_ITEM = {
   path: '/admin',
 };
 
-export default function AppLayout({ children, onToggleTheme, isDarkMode }: Props) {
+export default function AppLayout({ children }: Props) {
   const { user } = useAuthContext();
+  const { mode, toggleTheme } = useThemeContext();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -52,10 +51,9 @@ export default function AppLayout({ children, onToggleTheme, isDarkMode }: Props
   const currentNavIndex = navItems.findIndex((item) =>
     location.pathname.startsWith(item.path)
   );
-  const [navValue, setNavValue] = useState(currentNavIndex === -1 ? 0 : currentNavIndex);
+  const navValue = currentNavIndex === -1 ? 0 : currentNavIndex;
 
   function handleNavChange(_: React.SyntheticEvent, newValue: number) {
-    setNavValue(newValue);
     navigate(navItems[newValue].path);
   }
 
@@ -66,8 +64,8 @@ export default function AppLayout({ children, onToggleTheme, isDarkMode }: Props
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>
             🏀 BBall Training
           </Typography>
-          <IconButton color="inherit" onClick={onToggleTheme} sx={{ mr: 1 }}>
-            {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          <IconButton color="inherit" onClick={toggleTheme} sx={{ mr: 1 }}>
+            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
           <IconButton color="inherit" onClick={() => navigate('/profile')}>
             <AccountCircleIcon />

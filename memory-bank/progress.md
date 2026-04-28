@@ -7,7 +7,7 @@
 | 02 | TypeScript Data Models | ✅ Done |
 | 03 | Firebase Services | ✅ Done |
 | 04 | Authentication | ✅ Done |
-| 05 | Routing and Layout | ⬜ Pending |
+| 05 | Routing and Layout | ✅ Done |
 | 06 | Theme and Dark Mode | ⬜ Pending |
 | 07 | Exercise Library (Admin) | ⬜ Pending |
 | 08 | Training Plans (Admin) | ⬜ Pending |

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthContext } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -18,7 +17,7 @@ import AdminExercisesPage from './pages/admin/AdminExercisesPage';
 import AdminPlansPage from './pages/admin/AdminPlansPage';
 import { Box, CircularProgress } from '@mui/material';
 
-function AppRoutes({ onToggleTheme, isDarkMode }: { onToggleTheme: () => void; isDarkMode: boolean }) {
+function AppRoutes() {
   const { user, loading } = useAuthContext();
 
   if (loading) {
@@ -40,7 +39,7 @@ function AppRoutes({ onToggleTheme, isDarkMode }: { onToggleTheme: () => void; i
         path="/"
         element={
           <ProtectedRoute>
-            <AppLayout onToggleTheme={onToggleTheme} isDarkMode={isDarkMode}>
+            <AppLayout>
               <Navigate to="/dashboard" replace />
             </AppLayout>
           </ProtectedRoute>
@@ -60,9 +59,7 @@ function AppRoutes({ onToggleTheme, isDarkMode }: { onToggleTheme: () => void; i
           path={path}
           element={
             <ProtectedRoute>
-              <AppLayout onToggleTheme={onToggleTheme} isDarkMode={isDarkMode}>
-                {element}
-              </AppLayout>
+              <AppLayout>{element}</AppLayout>
             </ProtectedRoute>
           }
         />
@@ -80,9 +77,7 @@ function AppRoutes({ onToggleTheme, isDarkMode }: { onToggleTheme: () => void; i
           path={path}
           element={
             <ProtectedRoute requiredRole="admin">
-              <AppLayout onToggleTheme={onToggleTheme} isDarkMode={isDarkMode}>
-                {element}
-              </AppLayout>
+              <AppLayout>{element}</AppLayout>
             </ProtectedRoute>
           }
         />
@@ -94,15 +89,9 @@ function AppRoutes({ onToggleTheme, isDarkMode }: { onToggleTheme: () => void; i
 }
 
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  function handleToggleTheme() {
-    setIsDarkMode((prev) => !prev);
-  }
-
   return (
     <BrowserRouter>
-      <AppRoutes onToggleTheme={handleToggleTheme} isDarkMode={isDarkMode} />
+      <AppRoutes />
     </BrowserRouter>
   );
 }

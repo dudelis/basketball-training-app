@@ -1,23 +1,21 @@
 # Active Context
 
 ## Current Status
-**Last completed step: Step 04 – Authentication**
-**Next step: Step 05 – Routing and Layout**
+**Last completed step: Step 05 – Routing and Layout**
+**Next step: Step 06 – Theme and Dark Mode**
 
-## What Was Just Done (Step 04)
-- `src/services/auth.ts` — signInWithEmail, signUpWithEmail, signInWithGoogle, signOut; friendly error messages mapped from Firebase error codes
-- `src/hooks/useAuth.ts` — subscribes to onAuthStateChanged, fetches AppUser from Firestore, returns full auth state + actions
-- `src/contexts/AuthContext.tsx` — AuthProvider wraps the app; useAuthContext hook for consumers
-- `src/pages/LoginPage.tsx` — MUI Card, email/password form, Google sign-in, error Alert, link to Register
-- `src/pages/RegisterPage.tsx` — name/email/password/confirm form, client-side validation, error Alert, link to Login
-- `src/App.tsx` — BrowserRouter + Routes: /login, /register, / (redirects to /login if unauthenticated)
-- `src/main.tsx` — wrapped with AuthProvider
-- Build passes ✅
+## What Was Just Done (Step 05)
+- `src/components/ProtectedRoute.tsx` — auth guard with optional `requiredRole` prop; redirects unauthenticated → /login, non-admin → /dashboard
+- `src/components/AppLayout.tsx` — fixed AppBar (title, theme toggle placeholder, profile icon) + fixed BottomNavigation (5 tabs + Admin tab for admins); active route highlighted
+- 11 placeholder pages created: DashboardPage, ExercisesPage, PlansPage, MyPlansPage, HistoryPage, ProfilePage, ActiveSessionPage + 4 admin pages
+- `src/App.tsx` rewritten — full route structure, public routes redirect authenticated users to /dashboard
+- Build passes ✅, layout verified in browser
 
 ## Active Decisions / Notes
-- MUI v6 system props (display, fontWeight, etc.) must go inside `sx={}`, not as direct props — causes TS2769 otherwise
-- Using `--legacy-peer-deps` for npm installs
+- MUI v6 system props must go inside `sx={}` — direct shorthand props cause TS2769
+- Theme toggle button wired up in AppLayout (onToggleTheme/isDarkMode props) but no-op until Step 06
+- `isDarkMode` state lives in App.tsx and will be connected to ThemeProvider in Step 06
 - Firebase project: `basketball-training-app-a5360`
 
 ## What to Do Next
-Read `.github/prompts/05-routing-and-layout.prompt.md` and implement step 05.
+Read `.github/prompts/06-theme-and-dark-mode.prompt.md` and implement step 06.
