@@ -1,10 +1,24 @@
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthContext } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import AppLayout from './components/AppLayout';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import ExercisesPage from './pages/ExercisesPage';
+import PlansPage from './pages/PlansPage';
+import MyPlansPage from './pages/MyPlansPage';
+import HistoryPage from './pages/HistoryPage';
+import ProfilePage from './pages/ProfilePage';
+import ActiveSessionPage from './pages/ActiveSessionPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminExerciseTypesPage from './pages/admin/AdminExerciseTypesPage';
+import AdminExercisesPage from './pages/admin/AdminExercisesPage';
+import AdminPlansPage from './pages/admin/AdminPlansPage';
 import { Box, CircularProgress } from '@mui/material';
 
-function AppRoutes() {
+function AppRoutes({ onToggleTheme, isDarkMode }: { onToggleTheme: () => void; isDarkMode: boolean }) {
   const { user, loading } = useAuthContext();
 
   if (loading) {
@@ -17,30 +31,78 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      {/* Public routes */}
+      <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/dashboard" replace />} />
+
+      {/* Protected routes */}
       <Route
         path="/"
         element={
-          user ? (
-            <Box sx={{ p: 4 }}>
-              <h2>Welcome, {user.name}! 🏀</h2>
-              <p>Dashboard coming in Step 14.</p>
-            </Box>
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          <ProtectedRoute>
+            <AppLayout onToggleTheme={onToggleTheme} isDarkMode={isDarkMode}>
+              <Navigate to="/dashboard" replace />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {[
+        { path: '/dashboard', element: <DashboardPage /> },
+        { path: '/exercises', element: <ExercisesPage /> },
+        { path: '/plans', element: <PlansPage /> },
+        { path: '/my-plans', element: <MyPlansPage /> },
+        { path: '/history', element: <HistoryPage /> },
+        { path: '/profile', element: <ProfilePage /> },
+        { path: '/session/:sessionId', element: <ActiveSessionPage /> },
+      ].map(({ path, element }) => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <ProtectedRoute>
+              <AppLayout onToggleTheme={onToggleTheme} isDarkMode={isDarkMode}>
+                {element}
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+      ))}
+
+      {/* Admin-only routes */}
+      {[
+        { path: '/admin', element: <AdminDashboardPage /> },
+        { path: '/admin/exercise-types', element: <AdminExerciseTypesPage /> },
+        { path: '/admin/exercises', element: <AdminExercisesPage /> },
+        { path: '/admin/plans', element: <AdminPlansPage /> },
+      ].map(({ path, element }) => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AppLayout onToggleTheme={onToggleTheme} isDarkMode={isDarkMode}>
+                {element}
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+      ))}
+
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
 
 export default function App() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  function handleToggleTheme() {
+    setIsDarkMode((prev) => !prev);
+  }
+
   return (
     <BrowserRouter>
-      <AppRoutes />
+      <AppRoutes onToggleTheme={handleToggleTheme} isDarkMode={isDarkMode} />
     </BrowserRouter>
   );
 }

@@ -1,29 +1,23 @@
 # Active Context
 
 ## Current Status
-**Last completed step: Step 03 – Firebase Services**
-**Next step: Step 04 – Authentication**
+**Last completed step: Step 04 – Authentication**
+**Next step: Step 05 – Routing and Layout**
 
-## What Was Just Done (Step 03)
-- Created `src/services/` folder with 6 service modules:
-  - `users.ts` – createUserProfile, getUserProfile, updateUserProfile
-  - `exerciseTypes.ts` – CRUD for exercise type categories
-  - `exercises.ts` – CRUD for exercises
-  - `trainingPlans.ts` – CRUD for admin training plans
-  - `userPlans.ts` – CRUD for trainee custom plans (userId-scoped)
-  - `trainingSessions.ts` – create/read training sessions (userId-scoped)
-  - `storage.ts` – profile image, exercise video/image upload + deleteFile
-- Created `firestore.rules` with RBAC security rules
-- Created `firebase.json` + `firestore.indexes.json` via `firebase init firestore`
-- Deployed Firestore rules to Firebase project `basketball-training-app-a5360`
-- `.firebaserc` is gitignored
+## What Was Just Done (Step 04)
+- `src/services/auth.ts` — signInWithEmail, signUpWithEmail, signInWithGoogle, signOut; friendly error messages mapped from Firebase error codes
+- `src/hooks/useAuth.ts` — subscribes to onAuthStateChanged, fetches AppUser from Firestore, returns full auth state + actions
+- `src/contexts/AuthContext.tsx` — AuthProvider wraps the app; useAuthContext hook for consumers
+- `src/pages/LoginPage.tsx` — MUI Card, email/password form, Google sign-in, error Alert, link to Register
+- `src/pages/RegisterPage.tsx` — name/email/password/confirm form, client-side validation, error Alert, link to Login
+- `src/App.tsx` — BrowserRouter + Routes: /login, /register, / (redirects to /login if unauthenticated)
+- `src/main.tsx` — wrapped with AuthProvider
 - Build passes ✅
 
 ## Active Decisions / Notes
-- Using `--legacy-peer-deps` for npm installs due to vite-plugin-pwa/Vite 8 incompatibility
-- React version is 19 (Vite scaffold default) — prompt specified 18, but 19 works fine
+- MUI v6 system props (display, fontWeight, etc.) must go inside `sx={}`, not as direct props — causes TS2769 otherwise
+- Using `--legacy-peer-deps` for npm installs
 - Firebase project: `basketball-training-app-a5360`
-- `.env` is filled with real Firebase credentials
 
 ## What to Do Next
-Read `.github/prompts/04-authentication.prompt.md` and implement step 04.
+Read `.github/prompts/05-routing-and-layout.prompt.md` and implement step 05.
