@@ -5,7 +5,7 @@
 |------|-------|--------|
 | 01 | Project Setup | ✅ Done |
 | 02 | TypeScript Data Models | ✅ Done |
-| 03 | Firebase Services | ⬜ Pending |
+| 03 | Firebase Services | ✅ Done |
 | 04 | Authentication | ⬜ Pending |
 | 05 | Routing and Layout | ⬜ Pending |
 | 06 | Theme and Dark Mode | ⬜ Pending |
@@ -21,7 +21,16 @@
 
 ## Step Details
 
-### ✅ Step 02 – TypeScript Data Models
+### ✅ Step 03 – Firebase Services
+**Commit:** `4f23ac2` – "Step 03: Firebase service modules and Firestore security rules"
+- Created `src/services/` with 6 modules: users, exerciseTypes, exercises, trainingPlans, userPlans, trainingSessions, storage
+- All collections use named constants; all functions use async/await
+- `firestore.rules` with RBAC: admin full access, trainees scoped to own data
+- `firebase.json` + `firestore.indexes.json` generated via `firebase init firestore`
+- Rules deployed to Firebase project `basketball-training-app-a5360`
+- Build passes ✅
+
+
 **Commit:** `0ab5b7a` – "Step 02: TypeScript data models"
 - Populated `src/types/index.ts` with all 12 shared types
 - AppUser, UserRole, ExerciseType, Exercise, PlanExercise, TrainingPlan, UserPlan, SessionExercise, TrainingSession, TimerStatus, TimerState
