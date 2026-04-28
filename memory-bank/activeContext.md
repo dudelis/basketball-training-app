@@ -1,19 +1,14 @@
 # Active Context
 
 ## Current Status
-**Last completed step: Step 01 – Project Setup**
-**Next step: Step 02 – TypeScript Data Models**
+**Last completed step: Step 02 – TypeScript Data Models**
+**Next step: Step 03 – Firebase Services**
 
-## What Was Just Done (Step 01)
-- Scaffolded Vite + React 19 + TypeScript project
-- Installed all required dependencies (MUI v6, Firebase, React Router v6, vite-plugin-pwa)
-- Created full folder structure under `src/`
-- Created `src/firebase.ts` with Auth, Firestore, Storage exports
-- Created `.env.example` and `.env` (gitignored)
-- Configured `vite-plugin-pwa` with Basketball Training PWA manifest
-- Enabled TypeScript strict mode
-- Simplified `App.tsx` and `main.tsx` to minimal placeholder
-- Build passes with zero errors ✅
+## What Was Just Done (Step 02)
+- Populated `src/types/index.ts` with all shared types
+- Types: AppUser, UserRole, ExerciseType, Exercise, PlanExercise, TrainingPlan, UserPlan, SessionExercise, TrainingSession, TimerStatus, TimerState
+- No Firebase or React imports — pure TypeScript
+- Build passes ✅
 
 ## Active Decisions / Notes
 - Using `--legacy-peer-deps` for npm installs due to vite-plugin-pwa/Vite 8 incompatibility

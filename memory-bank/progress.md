@@ -4,7 +4,7 @@
 | Step | Title | Status |
 |------|-------|--------|
 | 01 | Project Setup | ✅ Done |
-| 02 | TypeScript Data Models | ⬜ Pending |
+| 02 | TypeScript Data Models | ✅ Done |
 | 03 | Firebase Services | ⬜ Pending |
 | 04 | Authentication | ⬜ Pending |
 | 05 | Routing and Layout | ⬜ Pending |
