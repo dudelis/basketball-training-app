@@ -16,4 +16,5 @@
 - `.env` has empty Firebase values — needs to be filled with real Firebase project config before running auth/db features
 
 ## What to Do Next
-Read `.github/prompts/02-typescript-data-models.prompt.md` and implement step 02.
+Read `.github/prompts/03-firebase-services.prompt.md` and implement step 03.
+**Note:** Step 03 requires Firebase project credentials — user needs to provide `.env` values before Firebase services can be tested. Firebase skill may also be needed.

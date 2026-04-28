@@ -21,7 +21,12 @@
 
 ## Step Details
 
-### ✅ Step 01 – Project Setup
+### ✅ Step 02 – TypeScript Data Models
+**Commit:** `0ab5b7a` – "Step 02: TypeScript data models"
+- Populated `src/types/index.ts` with all 12 shared types
+- AppUser, UserRole, ExerciseType, Exercise, PlanExercise, TrainingPlan, UserPlan, SessionExercise, TrainingSession, TimerStatus, TimerState
+- No Firebase or React imports — pure TypeScript
+- Build passes ✅
 **Commit:** `00065fe` – "Step 01: Project setup - Vite + React + TS + MUI + Firebase + PWA"
 - Vite 8 + React 19 + TypeScript scaffolded
 - MUI v6, Firebase, React Router v6, vite-plugin-pwa installed
