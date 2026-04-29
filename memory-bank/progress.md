@@ -14,75 +14,90 @@
 | 09 | Trainee Exercises and Custom Plans | ✅ Done |
 | 10 | Timer System | ✅ Done |
 | 11 | Active Session | ✅ Done |
-| 12 | Training History | ⬜ Pending |
-| 13 | Profile Management | ⬜ Pending |
-| 14 | Dashboard | ⬜ Pending |
-| 15 | PWA and Deployment | ⬜ Pending |
+| 12 | Training History | ✅ Done |
+| 13 | Profile Management | ✅ Done |
+| 14 | Dashboard | ✅ Done |
+| 15 | PWA and Deployment | ✅ Done |
+
+## Post-Step Improvements
+| Item | Commit | Status |
+|------|--------|--------|
+| Fix duplicate ProfilePage export | `59f4885` | ✅ Done |
+| Admin Dashboard page | `4fdea7d` | ✅ Done |
+| Two-table ExerciseType/Subtype model | `63914a3` | ✅ Done |
+| Mobile bottom nav fix (5 items/role) | `016414e` | ✅ Done |
+| Seed button UX + Reset & Reseed | `bd3946a` | ✅ Done |
 
 ## Step Details
 
+### ✅ Step 15 – PWA & Deployment
+**Commit:** `e3d69f1`
+- Full VitePWA config: manifest, workbox, runtime caching, `navigateFallback: '/offline.html'`
+- Placeholder icons: `public/pwa-192x192.png`, `public/pwa-512x512.png`, `public/apple-touch-icon.png`
+- `public/offline.html` — branded offline fallback page
+- `vercel.json` + `netlify.toml` confirmed correct
+- `README.md` rewritten with deployment instructions
+- Production build passes ✅
+
+### ✅ Step 14 – Dashboard
+**Commit:** `6b3c715`
+- `src/pages/DashboardPage.tsx` — role-aware dashboard
+- `TraineeDashboard`: weekly stats (sessions/minutes/exercises), Quick Start buttons, Recent Activity list
+- `AdminDashboard`: 4 stat cards + 3 quick action buttons
+
+### ✅ Step 13 – Profile Management
+- `src/pages/ProfilePage.tsx` — edit name, view email/role, avatar, upload button (non-functional pending Blaze plan)
+- `src/services/users.ts` — `updateUserProfile()`
+
+### ✅ Step 12 – Training History
+- `src/pages/HistoryPage.tsx` — list of past sessions, duration/exercise count, detail expand
+
 ### ✅ Step 11 – Active Session
-**Commit:** `47a368e` – (included with Step 10)
-- `src/pages/ActiveSessionPage.tsx` — full training session flow
+**Commit:** `47a368e` (included with Step 10)
+- `src/pages/ActiveSessionPage.tsx` — full session flow
 - Loads plan or single exercise from Firestore
-- Shows MediaPanel (YouTube/images) + TimerDisplay side-by-side
-- Tracks per-exercise results (done/skip)
-- Session summary screen with exercise checklist
-- Saves `TrainingSession` document to Firestore on completion
-- Navigation guards: `beforeunload` + `popstate` when session is running
+- MediaPanel + TimerDisplay side-by-side
+- Per-exercise results (done/skip), session summary, saves `TrainingSession` to Firestore
+- Navigation guards: `beforeunload` + `popstate` when session running
 
 ### ✅ Step 10 – Timer System
-**Commit:** `47a368e` – "Step 10: Timer system"
-- `src/hooks/useTimer.ts` — countdown with localStorage persistence (`bball_timer_v1`), beep on finish, Web Notifications, adjust ±1/5 min
-- `src/components/TimerDisplay.tsx` — large countdown display, color states (green/orange/red/grey), Pause/Resume/Reset buttons, completion banner
-- **Bug fix** (`525c6d1`): `adjust()` now triggers finish when paused timer is adjusted to 0 (extended condition to `running || paused`); React 18 Strict Mode handled via `finishedRef` guard
+**Commit:** `47a368e`
+- `src/hooks/useTimer.ts` — countdown with localStorage persistence (`bball_timer_v1`), beep, Web Notifications, adjust ±1/5 min
+- `src/components/TimerDisplay.tsx` — large countdown, color states (green/orange/red/grey), Pause/Resume/Reset, completion banner
+- **Bug fix** (`525c6d1`): `adjust()` triggers finish when paused timer adjusted to 0; React 18 Strict Mode handled via `finishedRef` guard
 
 ### ✅ Step 09 – Trainee Exercises and Custom Plans
-**Commit:** `2b06f52` – "Step 09: Trainee Exercise Library and Custom Plans"
+**Commit:** `2b06f52`
 - `src/components/ExerciseCard.tsx`
-- `src/pages/ExercisesPage.tsx`
+- `src/pages/ExercisesPage.tsx` — type + subtype filter (updated in `63914a3`)
 - `src/pages/MyPlansPage.tsx`
 - `src/pages/UserPlanFormPage.tsx`
 
 ### ✅ Step 08 – Training Plans (Admin)
-**Commit:** `f5aff5b` – "Step 08: Training Plans Admin"
+**Commit:** `f5aff5b`
 - `src/pages/admin/AdminPlansPage.tsx`
 - `src/pages/admin/AdminPlanFormPage.tsx`
 - `src/components/ExercisePickerDialog.tsx`
 - `src/pages/PlansPage.tsx` (trainee view)
 
 ### ✅ Step 07 – Exercise Library (Admin)
-**Commit:** `37a1b5c` – "Step 07: Exercise Library Admin"
-- `src/components/MediaUpload.tsx`
-- `src/pages/admin/AdminExerciseTypesPage.tsx`
-- `src/pages/admin/AdminExercisesPage.tsx`
-- `src/pages/admin/AdminExerciseFormPage.tsx`
-- **Bug fix** (`525c6d1`): `createExercise()` strips `undefined` fields before `addDoc` (Firestore rejects undefined)
+**Commit:** `37a1b5c`
+- `src/pages/admin/AdminExerciseTypesPage.tsx` — rewritten in `63914a3` with two-table hierarchy + Reset & Reseed
+- `src/pages/admin/AdminExercisesPage.tsx` — rewritten in `63914a3` with subtype chip
+- `src/pages/admin/AdminExerciseFormPage.tsx` — rewritten in `63914a3` with cascading type→subtype selects
+- `src/services/exerciseSubtypes.ts` — new service added in `63914a3`
+- **Bug fix** (`525c6d1`): `createExercise()` strips `undefined` fields before `addDoc`
 
 ### ✅ Step 03 – Firebase Services
-**Commit:** `4f23ac2` – "Step 03: Firebase service modules and Firestore security rules"
-- Created `src/services/` with 6 modules: users, exerciseTypes, exercises, trainingPlans, userPlans, trainingSessions, storage
-- All collections use named constants; all functions use async/await
-- `firestore.rules` with RBAC: admin full access, trainees scoped to own data
-- `firebase.json` + `firestore.indexes.json` generated via `firebase init firestore`
+**Commit:** `4f23ac2`
+- `src/services/` — users, exerciseTypes, exerciseSubtypes, exercises, trainingPlans, userPlans, trainingSessions, storage
+- `firestore.rules` with RBAC — updated in `63914a3` to include `exerciseSubtypes`
 - Rules deployed to Firebase project `basketball-training-app-a5360`
-- Build passes ✅
-- **Bug fix** (`525c6d1`): `createTrainingPlan()` and `createTrainingSession()` strip `undefined` fields before `addDoc`
 
-**Commit:** `0ab5b7a` – "Step 02: TypeScript data models"
-- Populated `src/types/index.ts` with all 12 shared types
-- AppUser, UserRole, ExerciseType, Exercise, PlanExercise, TrainingPlan, UserPlan, SessionExercise, TrainingSession, TimerStatus, TimerState
-- No Firebase or React imports — pure TypeScript
-- Build passes ✅
-**Commit:** `00065fe` – "Step 01: Project setup - Vite + React + TS + MUI + Firebase + PWA"
-- Vite 8 + React 19 + TypeScript scaffolded
-- MUI v6, Firebase, React Router v6, vite-plugin-pwa installed
-- Folder structure: components/, hooks/, pages/admin/, services/, types/, theme/
-- src/firebase.ts created with auth, db, storage exports
-- .env.example created; .env gitignored
-- PWA manifest configured in vite.config.ts
-- TypeScript strict mode enabled
-- Build passes ✅
+### ✅ Steps 01–06
+- `00065fe` — Project setup (Vite 8, React 19, TS, MUI, Firebase, PWA)
+- `0ab5b7a` — TypeScript data models (12 shared types in `src/types/index.ts`; `ExerciseSubtype` added in `63914a3`)
+- Auth, routing, layout, theme all complete
 
 ## Step Details
 
