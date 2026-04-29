@@ -26,7 +26,8 @@ export async function getTrainingPlanById(id: string): Promise<TrainingPlan | nu
 export async function createTrainingPlan(
   data: Omit<TrainingPlan, 'id'>
 ): Promise<string> {
-  const ref = await addDoc(collection(db, COLLECTION), data);
+  const clean = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
+  const ref = await addDoc(collection(db, COLLECTION), clean);
   return ref.id;
 }
 

@@ -15,7 +15,8 @@ const COLLECTION = 'trainingSessions';
 export async function createTrainingSession(
   data: Omit<TrainingSession, 'id'>
 ): Promise<string> {
-  const ref = await addDoc(collection(db, COLLECTION), data);
+  const clean = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
+  const ref = await addDoc(collection(db, COLLECTION), clean);
   return ref.id;
 }
 

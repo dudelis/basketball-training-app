@@ -187,37 +187,40 @@ export function useTimer(initialSeconds: number) {
 
   const adjust = useCallback((deltaSeconds: number) => {
     setState((prev) => {
+      if (prev.status === 'finished') return prev;
+
       const currentRemaining = prev.status === 'running' && prev.startedAt
         ? getRemaining(baseRemainingRef.current, prev.startedAt, Date.now())
         : prev.remainingSeconds;
 
       const newRemaining = clamp(currentRemaining + deltaSeconds);
 
-      if (newRemaining <= 0 && prev.status === 'running') {
+      if (newRemaining <= 0 && (prev.status === 'running' || prev.status === 'paused')) {
         triggerFinish();
         return prev;
       }
 
       const now = Date.now();
       baseRemainingRef.current = newRemaining;
+      const newDuration = clamp(prev.durationSeconds + deltaSeconds);
       if (prev.status === 'running') {
         saveToStorage({
           status: 'running',
-          durationSeconds: prev.durationSeconds,
+          durationSeconds: newDuration,
           baseRemaining: newRemaining,
           startedAt: now,
         });
-        return { ...prev, remainingSeconds: newRemaining, startedAt: now };
+        return { ...prev, remainingSeconds: newRemaining, durationSeconds: newDuration, startedAt: now };
       }
       if (prev.status !== 'finished') {
         saveToStorage({
           status: prev.status as 'running' | 'paused',
-          durationSeconds: prev.durationSeconds,
+          durationSeconds: newDuration,
           baseRemaining: newRemaining,
           startedAt: prev.startedAt ?? now,
         });
       }
-      return { ...prev, remainingSeconds: newRemaining };
+      return { ...prev, remainingSeconds: newRemaining, durationSeconds: newDuration };
     });
   }, [triggerFinish]);
 
