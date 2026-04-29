@@ -11,6 +11,7 @@ import MyPlansPage from './pages/MyPlansPage';
 import HistoryPage from './pages/HistoryPage';
 import ProfilePage from './pages/ProfilePage';
 import ActiveSessionPage from './pages/ActiveSessionPage';
+import UserPlanFormPage from './pages/UserPlanFormPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminExerciseTypesPage from './pages/admin/AdminExerciseTypesPage';
 import AdminExercisesPage from './pages/admin/AdminExercisesPage';
@@ -55,6 +56,10 @@ function AppRoutes() {
         { path: '/history', element: <HistoryPage /> },
         { path: '/profile', element: <ProfilePage /> },
         { path: '/session/:sessionId', element: <ActiveSessionPage /> },
+        { path: '/session/exercise/:exerciseId', element: <ActiveSessionPage /> },
+        { path: '/session/plan/:planId', element: <ActiveSessionPage /> },
+        { path: '/my-plans/new', element: <UserPlanFormPage /> },
+        { path: '/my-plans/:id', element: <UserPlanFormPage /> },
       ].map(({ path, element }) => (
         <Route
           key={path}

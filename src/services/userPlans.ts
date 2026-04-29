@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   addDoc,
+  getDoc,
   getDocs,
   updateDoc,
   deleteDoc,
@@ -17,6 +18,12 @@ export async function getUserPlans(userId: string): Promise<UserPlan[]> {
   const q = query(collection(db, COLLECTION), where('userId', '==', userId));
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as UserPlan);
+}
+
+export async function getUserPlanById(id: string): Promise<UserPlan | null> {
+  const snap = await getDoc(doc(db, COLLECTION, id));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as UserPlan;
 }
 
 export async function createUserPlan(data: Omit<UserPlan, 'id'>): Promise<string> {
