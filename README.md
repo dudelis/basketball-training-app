@@ -1,11 +1,58 @@
-# React + TypeScript + Vite
+# 🏀 Basketball Training App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A mobile-first Progressive Web App for basketball training. Trainers create structured plans and manage the exercise library; trainees execute sessions with a timer and track their history.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Frontend**: React 18 + TypeScript, MUI v9, Vite
+- **Backend**: Firebase (Firestore, Auth, Storage)
+- **PWA**: vite-plugin-pwa (installable, offline-capable)
+
+## Local Development
+
+```bash
+npm install        # install dependencies
+npm run dev        # start dev server
+npm run build      # production build
+npm run preview    # preview production build
+```
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and fill in your Firebase project values:
+
+```
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+Never commit `.env` — it is gitignored.
+
+## Firebase Setup
+
+1. Create a project at [console.firebase.google.com](https://console.firebase.google.com)
+2. Enable **Authentication** → Google and Email/Password providers
+3. Enable **Firestore** → start in production mode
+4. Deploy security rules: `firebase deploy --only firestore:rules`
+5. (Optional) Enable **Storage** for photo uploads — requires Blaze plan
+
+## Deployment
+
+### Vercel
+
+Import the repo, add environment variables in the dashboard, and deploy.  
+SPA routing is handled via `vercel.json`.
+
+### Netlify
+
+Import the repo, add environment variables in the dashboard, and deploy.  
+Build config and redirects are in `netlify.toml`.
+
+---
 
 ## React Compiler
 

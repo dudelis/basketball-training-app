@@ -212,14 +212,12 @@ export function useTimer(initialSeconds: number) {
         });
         return { ...prev, remainingSeconds: newRemaining, durationSeconds: newDuration, startedAt: now };
       }
-      if (prev.status !== 'finished') {
-        saveToStorage({
+      saveToStorage({
           status: prev.status as 'running' | 'paused',
           durationSeconds: newDuration,
           baseRemaining: newRemaining,
           startedAt: prev.startedAt ?? now,
         });
-      }
       return { ...prev, remainingSeconds: newRemaining, durationSeconds: newDuration };
     });
   }, [triggerFinish]);

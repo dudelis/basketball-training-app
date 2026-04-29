@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../firebase';

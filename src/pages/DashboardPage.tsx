@@ -12,7 +12,7 @@ import { getTrainingSessions } from '../services/trainingSessions';
 import { getTrainingPlans } from '../services/trainingPlans';
 import { getExercises } from '../services/exercises';
 import { getExerciseTypes } from '../services/exerciseTypes';
-import type { TrainingSession, TrainingPlan } from '../types';
+import type { TrainingSession } from '../types';
 
 function getGreeting(name: string): string {
   const hour = new Date().getHours();
