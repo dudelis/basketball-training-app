@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
+  Avatar,
   Box,
   BottomNavigation,
   BottomNavigationAction,
@@ -15,7 +16,6 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import HistoryIcon from '@mui/icons-material/History';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import type { ReactNode } from 'react';
@@ -67,8 +67,13 @@ export default function AppLayout({ children }: Props) {
           <IconButton color="inherit" onClick={toggleTheme} sx={{ mr: 1 }}>
             {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
-          <IconButton color="inherit" onClick={() => navigate('/profile')}>
-            <AccountCircleIcon />
+          <IconButton color="inherit" onClick={() => navigate('/profile')} sx={{ p: 0.5 }}>
+            <Avatar
+              src={user?.profileImageUrl}
+              sx={{ width: 32, height: 32, fontSize: 14, bgcolor: 'primary.light' }}
+            >
+              {!user?.profileImageUrl && (user?.name?.charAt(0).toUpperCase() ?? '?')}
+            </Avatar>
           </IconButton>
         </Toolbar>
       </AppBar>
