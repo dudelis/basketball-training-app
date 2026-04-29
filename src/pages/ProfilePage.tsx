@@ -25,7 +25,6 @@ export default function ProfilePage() {
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: AlertColor }>({
     open: false, message: '', severity: 'success',
   });
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const googleSyncedRef = useRef(false);
 
   // Auto-save Google photo on first load if none set yet
@@ -120,12 +119,18 @@ export default function ProfilePage() {
         </Avatar>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
           <Button
+            component="label"
             size="small"
             startIcon={<PhotoCameraIcon />}
             variant="outlined"
-            onClick={() => fileInputRef.current?.click()}
           >
             Upload Photo
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
           </Button>
           {googlePhotoUrl && (
             <Button
@@ -138,13 +143,6 @@ export default function ProfilePage() {
             </Button>
           )}
         </Box>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-        />
       </Box>
 
       {uploading && <LinearProgress sx={{ mb: 2 }} />}
