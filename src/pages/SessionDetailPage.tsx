@@ -113,6 +113,7 @@ export default function SessionDetailPage() {
                   >
                     <ListItemText
                       primary={e.title}
+                      slotProps={{ secondary: { component: 'div' } }}
                       secondary={
                         <Box component="span" sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
                           <Chip

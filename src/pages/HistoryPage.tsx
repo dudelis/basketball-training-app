@@ -137,6 +137,7 @@ export default function HistoryPage() {
                         <ListItemButton onClick={() => navigate(`/history/${s.id}`)}>
                           <ListItemText
                             primary={s.planTitle}
+                            slotProps={{ secondary: { component: 'div' } }}
                             secondary={
                               <Box component="span" sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
                                 <Chip
