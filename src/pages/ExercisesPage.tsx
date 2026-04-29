@@ -7,25 +7,29 @@ import {
 import type { SelectChangeEvent } from '@mui/material';
 import { getExercises } from '../services/exercises';
 import { getExerciseTypes } from '../services/exerciseTypes';
+import { getExerciseSubtypes } from '../services/exerciseSubtypes';
 import ExerciseCard from '../components/ExerciseCard';
-import type { Exercise, ExerciseType } from '../types';
+import type { Exercise, ExerciseType, ExerciseSubtype } from '../types';
 
 export default function ExercisesPage() {
   const navigate = useNavigate();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [exerciseTypes, setExerciseTypes] = useState<ExerciseType[]>([]);
+  const [allSubtypes, setAllSubtypes] = useState<ExerciseSubtype[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterTypeId, setFilterTypeId] = useState('');
+  const [filterSubtypeId, setFilterSubtypeId] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [exs, types] = await Promise.all([getExercises(), getExerciseTypes()]);
+      const [exs, types, subs] = await Promise.all([getExercises(), getExerciseTypes(), getExerciseSubtypes()]);
       setExercises(exs);
-      setExerciseTypes(types);
+      setExerciseTypes(types.sort((a, b) => a.name.localeCompare(b.name)));
+      setAllSubtypes(subs);
     } finally {
       setLoading(false);
     }
@@ -39,12 +43,20 @@ export default function ExercisesPage() {
     debounceRef.current = setTimeout(() => setDebouncedSearch(value), 300);
   }
 
+  function handleTypeChange(value: string) {
+    setFilterTypeId(value);
+    setFilterSubtypeId(''); // reset subtype when type changes
+  }
+
   function getType(typeId: string): ExerciseType | undefined {
     return exerciseTypes.find((t) => t.id === typeId);
   }
 
+  const subtypesForFilter = allSubtypes.filter((s) => s.typeId === filterTypeId);
+
   const filtered = exercises.filter((e) => {
     if (filterTypeId && e.typeId !== filterTypeId) return false;
+    if (filterSubtypeId && e.subtypeId !== filterSubtypeId) return false;
     if (debouncedSearch && !e.title.toLowerCase().includes(debouncedSearch.toLowerCase())) return false;
     return true;
   });
@@ -63,7 +75,7 @@ export default function ExercisesPage() {
           <InputLabel>Type</InputLabel>
           <Select
             value={filterTypeId} label="Type"
-            onChange={(e: SelectChangeEvent) => setFilterTypeId(e.target.value)}
+            onChange={(e: SelectChangeEvent) => handleTypeChange(e.target.value)}
           >
             <MenuItem value="">All types</MenuItem>
             {exerciseTypes.map((t) => (
@@ -71,6 +83,20 @@ export default function ExercisesPage() {
             ))}
           </Select>
         </FormControl>
+        {filterTypeId && subtypesForFilter.length > 0 && (
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Subtype</InputLabel>
+            <Select
+              value={filterSubtypeId} label="Subtype"
+              onChange={(e: SelectChangeEvent) => setFilterSubtypeId(e.target.value)}
+            >
+              <MenuItem value="">All subtypes</MenuItem>
+              {subtypesForFilter.map((s) => (
+                <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
       </Box>
 
       {loading ? (

@@ -15,7 +15,15 @@ export type AppUser = {
 
 export type ExerciseType = {
   id: string;
-  name: string; // e.g. "Dribbling", "Shooting", "Layups", "Free Throws", "Team Training"
+  name: string;
+};
+
+// Exercise Subtype (belongs to an ExerciseType)
+
+export type ExerciseSubtype = {
+  id: string;
+  name: string;
+  typeId: string; // references ExerciseType.id
 };
 
 // Exercise
@@ -25,6 +33,7 @@ export type Exercise = {
   title: string;
   description?: string;
   typeId: string;            // references ExerciseType.id
+  subtypeId?: string;        // references ExerciseSubtype.id
   youtubeUrl?: string;
   videoUrl?: string;         // Firebase Storage URL
   imageUrls?: string[];      // Firebase Storage URLs

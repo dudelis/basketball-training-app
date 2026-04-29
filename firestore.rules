@@ -28,6 +28,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Exercise subtypes: readable by all signed-in, writable by admins only
+    match /exerciseSubtypes/{subtypeId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
     // Exercises: readable by all signed-in, writable by admins only
     match /exercises/{exerciseId} {
       allow read: if isSignedIn();

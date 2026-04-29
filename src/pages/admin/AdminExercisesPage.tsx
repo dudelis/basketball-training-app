@@ -13,12 +13,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import { getExercises, deleteExercise } from '../../services/exercises';
 import { getExerciseTypes } from '../../services/exerciseTypes';
-import type { Exercise, ExerciseType } from '../../types';
+import { getExerciseSubtypes } from '../../services/exerciseSubtypes';
+import type { Exercise, ExerciseType, ExerciseSubtype } from '../../types';
 
 export default function AdminExercisesPage() {
   const navigate = useNavigate();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [exerciseTypes, setExerciseTypes] = useState<ExerciseType[]>([]);
+  const [allSubtypes, setAllSubtypes] = useState<ExerciseSubtype[]>([]);
   const [filterTypeId, setFilterTypeId] = useState('');
   const [loading, setLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; exercise?: Exercise }>({ open: false });
@@ -29,9 +31,10 @@ export default function AdminExercisesPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [exs, types] = await Promise.all([getExercises(), getExerciseTypes()]);
+      const [exs, types, subs] = await Promise.all([getExercises(), getExerciseTypes(), getExerciseSubtypes()]);
       setExercises(exs);
-      setExerciseTypes(types);
+      setExerciseTypes(types.sort((a, b) => a.name.localeCompare(b.name)));
+      setAllSubtypes(subs);
     } finally {
       setLoading(false);
     }
@@ -57,6 +60,11 @@ export default function AdminExercisesPage() {
 
   function getTypeName(typeId: string): string {
     return exerciseTypes.find((t) => t.id === typeId)?.name ?? '—';
+  }
+
+  function getSubtypeName(subtypeId?: string): string | null {
+    if (!subtypeId) return null;
+    return allSubtypes.find((s) => s.id === subtypeId)?.name ?? null;
   }
 
   const filtered = filterTypeId ? exercises.filter((e) => e.typeId === filterTypeId) : exercises;
@@ -95,7 +103,10 @@ export default function AdminExercisesPage() {
               <CardContent sx={{ pb: 0 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{exercise.title}</Typography>
                 <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
-                  <Chip label={getTypeName(exercise.typeId)} size="small" />
+                  <Chip label={getTypeName(exercise.typeId)} size="small" color="primary" variant="outlined" />
+                  {getSubtypeName(exercise.subtypeId) && (
+                    <Chip label={getSubtypeName(exercise.subtypeId)!} size="small" />
+                  )}
                   <Chip label={`${exercise.defaultDurationMinutes} min`} size="small" variant="outlined" />
                 </Box>
               </CardContent>
@@ -115,11 +126,7 @@ export default function AdminExercisesPage() {
         </Box>
       )}
 
-      <Fab
-        color="primary"
-        sx={{ position: 'fixed', bottom: 80, right: 16 }}
-        onClick={() => navigate('/admin/exercises/new')}
-      >
+      <Fab color="primary" sx={{ position: 'fixed', bottom: 80, right: 16 }} onClick={() => navigate('/admin/exercises/new')}>
         <AddIcon />
       </Fab>
 
@@ -134,8 +141,7 @@ export default function AdminExercisesPage() {
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={snackbar.open} autoHideDuration={3000}
+      <Snackbar open={snackbar.open} autoHideDuration={3000}
         onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >

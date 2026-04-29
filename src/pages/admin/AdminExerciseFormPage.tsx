@@ -8,10 +8,11 @@ import {
 import type { AlertColor, SelectChangeEvent } from '@mui/material';
 import { getExerciseById, createExercise, updateExercise } from '../../services/exercises';
 import { getExerciseTypes } from '../../services/exerciseTypes';
+import { getExerciseSubtypes } from '../../services/exerciseSubtypes';
 import { uploadExerciseVideo, uploadExerciseImage } from '../../services/storage';
 import { useAuthContext } from '../../contexts/AuthContext';
 import MediaUpload from '../../components/MediaUpload';
-import type { ExerciseType } from '../../types';
+import type { ExerciseType, ExerciseSubtype } from '../../types';
 
 function isValidYoutubeUrl(url: string): boolean {
   if (!url) return true;
@@ -24,11 +25,13 @@ export default function AdminExerciseFormPage() {
   const { user } = useAuthContext();
 
   const [exerciseTypes, setExerciseTypes] = useState<ExerciseType[]>([]);
+  const [allSubtypes, setAllSubtypes] = useState<ExerciseSubtype[]>([]);
   const [loading, setLoading] = useState(!!id);
   const [submitting, setSubmitting] = useState(false);
 
   const [title, setTitle] = useState('');
   const [typeId, setTypeId] = useState('');
+  const [subtypeId, setSubtypeId] = useState('');
   const [description, setDescription] = useState('');
   const [duration, setDuration] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -42,7 +45,10 @@ export default function AdminExerciseFormPage() {
   });
 
   useEffect(() => {
-    void getExerciseTypes().then(setExerciseTypes);
+    void Promise.all([getExerciseTypes(), getExerciseSubtypes()]).then(([types, subs]) => {
+      setExerciseTypes(types.sort((a, b) => a.name.localeCompare(b.name)));
+      setAllSubtypes(subs);
+    });
     if (id) {
       void (async () => {
         setLoading(true);
@@ -50,6 +56,7 @@ export default function AdminExerciseFormPage() {
         if (exercise) {
           setTitle(exercise.title);
           setTypeId(exercise.typeId);
+          setSubtypeId(exercise.subtypeId ?? '');
           setDescription(exercise.description ?? '');
           setDuration(String(exercise.defaultDurationMinutes));
           setYoutubeUrl(exercise.youtubeUrl ?? '');
@@ -60,6 +67,14 @@ export default function AdminExerciseFormPage() {
       })();
     }
   }, [id]);
+
+  // Reset subtype when type changes
+  function handleTypeChange(e: SelectChangeEvent) {
+    setTypeId(e.target.value);
+    setSubtypeId('');
+  }
+
+  const subtypesForType = allSubtypes.filter((s) => s.typeId === typeId);
 
   function showSnackbar(message: string, severity: AlertColor = 'success') {
     setSnackbar({ open: true, message, severity });
@@ -82,47 +97,41 @@ export default function AdminExerciseFormPage() {
     setSubmitting(true);
     try {
       const durationNum = parseInt(duration, 10);
+      const baseData = {
+        title: title.trim(),
+        typeId,
+        subtypeId: subtypeId || undefined,
+        description: description.trim() || undefined,
+        defaultDurationMinutes: durationNum,
+        youtubeUrl: youtubeUrl.trim() || undefined,
+      };
 
       if (id) {
         let finalVideoUrl = existingVideoUrl;
-        if (newVideoFile) {
-          finalVideoUrl = await uploadExerciseVideo(id, newVideoFile);
-        }
+        if (newVideoFile) finalVideoUrl = await uploadExerciseVideo(id, newVideoFile);
         const uploadedImageUrls = await Promise.all(
           newImageFiles.map((f) => uploadExerciseImage(id, `${Date.now()}_${f.name}`, f))
         );
         await updateExercise(id, {
-          title: title.trim(),
-          typeId,
-          description: description.trim() || undefined,
-          defaultDurationMinutes: durationNum,
-          youtubeUrl: youtubeUrl.trim() || undefined,
+          ...baseData,
           videoUrl: finalVideoUrl,
           imageUrls: [...existingImageUrls, ...uploadedImageUrls],
         });
       } else {
         const newId = await createExercise({
-          title: title.trim(),
-          typeId,
-          description: description.trim() || undefined,
-          defaultDurationMinutes: durationNum,
-          youtubeUrl: youtubeUrl.trim() || undefined,
+          ...baseData,
           videoUrl: undefined,
           imageUrls: [],
           createdBy: user?.id ?? '',
         });
         const mediaUpdate: { videoUrl?: string; imageUrls?: string[] } = {};
-        if (newVideoFile) {
-          mediaUpdate.videoUrl = await uploadExerciseVideo(newId, newVideoFile);
-        }
+        if (newVideoFile) mediaUpdate.videoUrl = await uploadExerciseVideo(newId, newVideoFile);
         if (newImageFiles.length > 0) {
           mediaUpdate.imageUrls = await Promise.all(
             newImageFiles.map((f) => uploadExerciseImage(newId, `${Date.now()}_${f.name}`, f))
           );
         }
-        if (Object.keys(mediaUpdate).length > 0) {
-          await updateExercise(newId, mediaUpdate);
-        }
+        if (Object.keys(mediaUpdate).length > 0) await updateExercise(newId, mediaUpdate);
       }
       navigate('/admin/exercises');
     } catch {
@@ -133,11 +142,7 @@ export default function AdminExerciseFormPage() {
   }
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
   }
 
   return (
@@ -156,15 +161,33 @@ export default function AdminExerciseFormPage() {
           required fullWidth error={!!errors.title} helperText={errors.title}
         />
 
+        {/* Type selector */}
         <FormControl fullWidth error={!!errors.typeId} required>
           <InputLabel>Exercise Type</InputLabel>
-          <Select value={typeId} label="Exercise Type" onChange={(e: SelectChangeEvent) => setTypeId(e.target.value)}>
+          <Select value={typeId} label="Exercise Type" onChange={handleTypeChange}>
             {exerciseTypes.map((t) => (
               <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>
             ))}
           </Select>
           {errors.typeId && <FormHelperText>{errors.typeId}</FormHelperText>}
         </FormControl>
+
+        {/* Subtype selector — shown once a type is selected */}
+        {typeId && (
+          <FormControl fullWidth>
+            <InputLabel>Subtype (optional)</InputLabel>
+            <Select
+              value={subtypeId}
+              label="Subtype (optional)"
+              onChange={(e: SelectChangeEvent) => setSubtypeId(e.target.value)}
+            >
+              <MenuItem value=""><em>None</em></MenuItem>
+              {subtypesForType.map((s) => (
+                <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
         <TextField
           label="Description" value={description} onChange={(e) => setDescription(e.target.value)}
@@ -185,8 +208,7 @@ export default function AdminExerciseFormPage() {
         />
 
         <MediaUpload
-          label="Video"
-          accept="video/*"
+          label="Video" accept="video/*"
           existingUrls={existingVideoUrl ? [existingVideoUrl] : []}
           onUpload={(files) => setNewVideoFile(files[0])}
           onRemoveExisting={() => setExistingVideoUrl(undefined)}
@@ -196,14 +218,10 @@ export default function AdminExerciseFormPage() {
         )}
 
         <MediaUpload
-          label="Images (up to 5)"
-          accept="image/*"
-          multiple
+          label="Images (up to 5)" accept="image/*" multiple
           existingUrls={existingImageUrls}
           onUpload={(files) =>
-            setNewImageFiles((prev) =>
-              [...prev, ...files].slice(0, 5 - existingImageUrls.length)
-            )
+            setNewImageFiles((prev) => [...prev, ...files].slice(0, 5 - existingImageUrls.length))
           }
           onRemoveExisting={(url) => setExistingImageUrls((prev) => prev.filter((u) => u !== url))}
         />
@@ -215,13 +233,9 @@ export default function AdminExerciseFormPage() {
         {errors.images && <FormHelperText error>{errors.images}</FormHelperText>}
 
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', pt: 1 }}>
-          <Button variant="outlined" onClick={() => navigate('/admin/exercises')} disabled={submitting}>
-            Cancel
-          </Button>
+          <Button variant="outlined" onClick={() => navigate('/admin/exercises')} disabled={submitting}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={submitting}>
-            {submitting
-              ? <CircularProgress size={20} color="inherit" />
-              : id ? 'Save Changes' : 'Create Exercise'}
+            {submitting ? <CircularProgress size={20} color="inherit" /> : id ? 'Save Changes' : 'Create Exercise'}
           </Button>
         </Box>
       </Stack>
