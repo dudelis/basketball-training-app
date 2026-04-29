@@ -1,0 +1,19 @@
+{"users": [
+{
+  "localId": "sFLtFYM1ycT5lLVmPHYIbOL1jmD3",
+  "email": "fukszon.kostya@gmail.com",
+  "emailVerified": true,
+  "displayName": "Konstantin Fukszon",
+  "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocK94oBLvrlxpkn4Xbfvl0pB5CbMr6c_LDg4lZ9OJA0Nbaxq_PN8Jw=s96-c",
+  "lastSignedInAt": "1777491769626",
+  "createdAt": "1777406871006",
+  "providerUserInfo": [
+    {
+      "providerId": "google.com",
+      "rawId": "100498561279497445289",
+      "email": "fukszon.kostya@gmail.com",
+      "displayName": "Konstantin Fukszon",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocK94oBLvrlxpkn4Xbfvl0pB5CbMr6c_LDg4lZ9OJA0Nbaxq_PN8Jw=s96-c"
+    }
+  ]
+}]}

@@ -2,14 +2,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Avatar, Button, TextField, Chip,
-  LinearProgress, Snackbar, Alert, Divider,
+  Snackbar, Alert, Divider, Tooltip,
 } from '@mui/material';
 import type { AlertColor } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useAuthContext } from '../contexts/AuthContext';
 import { updateUserProfile } from '../services/users';
-import { uploadProfileImage } from '../services/storage';
 import { signOut } from '../services/auth';
 import type { AppUser } from '../types';
 
@@ -18,16 +17,14 @@ export default function ProfilePage() {
   const { user, firebaseUser, refreshUser } = useAuthContext();
 
   const [name, setName] = useState(user?.name ?? '');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [pendingGooglePhoto, setPendingGooglePhoto] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: AlertColor }>({
     open: false, message: '', severity: 'success',
   });
   const googleSyncedRef = useRef(false);
 
-  // Auto-save Google photo on first load if none set yet
+  // Auto-save Google photo on first load if none set in Firestore yet
   useEffect(() => {
     if (
       !googleSyncedRef.current &&
@@ -42,69 +39,48 @@ export default function ProfilePage() {
     }
   }, [user, firebaseUser, refreshUser]);
 
-  // Revoke blob URL on cleanup
-  useEffect(() => {
-    return () => {
-      if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
   const isDirty =
     name.trim() !== (user?.name ?? '') ||
-    pendingFile !== null ||
     pendingGooglePhoto;
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
-    setPendingFile(file);
-    setPendingGooglePhoto(false);
-    setPreviewUrl(URL.createObjectURL(file));
-    // Reset input so re-selecting same file still fires onChange
-    e.target.value = '';
-  }
 
   function handleUseGooglePhoto() {
     if (!firebaseUser?.photoURL) return;
-    if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
-    setPendingFile(null);
     setPendingGooglePhoto(true);
-    setPreviewUrl(firebaseUser.photoURL);
   }
 
   const handleSave = useCallback(async () => {
     if (!user) return;
-    setUploading(true);
+    setSaving(true);
     try {
       const updates: Partial<AppUser> = {};
       if (name.trim() !== user.name) updates.name = name.trim();
-      if (pendingFile) {
-        updates.profileImageUrl = await uploadProfileImage(user.id, pendingFile);
-      } else if (pendingGooglePhoto && firebaseUser?.photoURL) {
+      if (pendingGooglePhoto && firebaseUser?.photoURL) {
         updates.profileImageUrl = firebaseUser.photoURL;
       }
       if (Object.keys(updates).length > 0) {
         await updateUserProfile(user.id, updates);
         await refreshUser();
       }
-      setPendingFile(null);
       setPendingGooglePhoto(false);
-      setPreviewUrl(null);
       setSnackbar({ open: true, message: 'Profile updated successfully.', severity: 'success' });
     } catch {
       setSnackbar({ open: true, message: 'Failed to update profile.', severity: 'error' });
     } finally {
-      setUploading(false);
+      setSaving(false);
     }
-  }, [user, name, pendingFile, pendingGooglePhoto, firebaseUser, refreshUser]);
+  }, [user, name, pendingGooglePhoto, firebaseUser, refreshUser]);
 
   async function handleSignOut() {
     await signOut();
     navigate('/login');
   }
 
-  const avatarSrc = previewUrl ?? user?.profileImageUrl;
+  // Show Google photo directly from firebaseUser as fallback (before Firestore sync completes)
+  const avatarSrc =
+    (pendingGooglePhoto ? firebaseUser?.photoURL : null) ??
+    user?.profileImageUrl ??
+    firebaseUser?.photoURL ??
+    undefined;
   const initials = user?.name?.charAt(0).toUpperCase() ?? '?';
   const googlePhotoUrl = firebaseUser?.photoURL;
 
@@ -114,38 +90,31 @@ export default function ProfilePage() {
 
       {/* Avatar */}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-        <Avatar src={avatarSrc ?? undefined} sx={{ width: 120, height: 120, fontSize: 48, mb: 1.5 }}>
+        <Avatar src={avatarSrc} sx={{ width: 120, height: 120, fontSize: 48, mb: 1.5 }}>
           {!avatarSrc && initials}
         </Avatar>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <Button
-            component="label"
-            size="small"
-            startIcon={<PhotoCameraIcon />}
-            variant="outlined"
-          >
-            Upload Photo
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-          </Button>
+          {/* TODO: enable once Firebase Storage (Blaze plan) is activated */}
+          <Tooltip title="Requires Firebase Storage upgrade">
+            <span>
+              <Button size="small" startIcon={<PhotoCameraIcon />} variant="outlined" disabled>
+                Upload Photo
+              </Button>
+            </span>
+          </Tooltip>
           {googlePhotoUrl && (
             <Button
               size="small"
               startIcon={<GoogleIcon />}
               variant="outlined"
               onClick={handleUseGooglePhoto}
+              disabled={pendingGooglePhoto}
             >
               Use Google Photo
             </Button>
           )}
         </Box>
       </Box>
-
-      {uploading && <LinearProgress sx={{ mb: 2 }} />}
 
       {/* Form */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -172,7 +141,7 @@ export default function ProfilePage() {
         </Box>
         <Button
           variant="contained"
-          disabled={!isDirty || uploading || !name.trim()}
+          disabled={!isDirty || saving || !name.trim()}
           onClick={() => void handleSave()}
           fullWidth
         >

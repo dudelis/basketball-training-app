@@ -41,7 +41,7 @@ const ADMIN_NAV_ITEM = {
 };
 
 export default function AppLayout({ children }: Props) {
-  const { user } = useAuthContext();
+  const { user, firebaseUser } = useAuthContext();
   const { mode, toggleTheme } = useThemeContext();
   const navigate = useNavigate();
   const location = useLocation();
@@ -69,10 +69,10 @@ export default function AppLayout({ children }: Props) {
           </IconButton>
           <IconButton color="inherit" onClick={() => navigate('/profile')} sx={{ p: 0.5 }}>
             <Avatar
-              src={user?.profileImageUrl}
+              src={user?.profileImageUrl ?? firebaseUser?.photoURL ?? undefined}
               sx={{ width: 32, height: 32, fontSize: 14, bgcolor: 'primary.light' }}
             >
-              {!user?.profileImageUrl && (user?.name?.charAt(0).toUpperCase() ?? '?')}
+              {!(user?.profileImageUrl ?? firebaseUser?.photoURL) && (user?.name?.charAt(0).toUpperCase() ?? '?')}
             </Avatar>
           </IconButton>
         </Toolbar>

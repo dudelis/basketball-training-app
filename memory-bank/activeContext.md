@@ -40,5 +40,9 @@
 - Timer STORAGE_KEY is `'bball_timer_v1'`; `ActiveSessionPage` clears it on mount for fresh sessions
 - `HistoryPage` is currently a stub (Step 12 not yet implemented)
 
+## TODOs (deferred)
+
+- **Profile photo upload** (`src/pages/ProfilePage.tsx`): Upload Photo button is present but non-functional. Requires Firebase Storage (Blaze plan). Once upgraded, implement `uploadProfileImage(userId, file)` call in `handleSave` and enable the file input overlay on the button. See `src/services/storage.ts` — `uploadProfileImage` is already implemented.
+
 ## What to Do Next
-Read `.github/prompts/12-training-history.prompt.md` and implement step 12.
+Read `.github/prompts/14-dashboard.prompt.md` and implement step 14.
