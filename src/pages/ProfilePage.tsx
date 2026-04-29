@@ -142,7 +142,7 @@ export default function ProfilePage() {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          hidden
+          style={{ display: 'none' }}
           onChange={handleFileChange}
         />
       </Box>
