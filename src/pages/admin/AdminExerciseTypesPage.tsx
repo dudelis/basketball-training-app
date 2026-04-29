@@ -29,7 +29,7 @@ const SEED_DATA = [
   { name: 'Footwork', subtypes: ['Pivoting (front/reverse)', 'Jab steps', 'Triple threat moves', 'Drop steps (post)', 'Spin moves', 'Ladder drills (agility)'] },
   { name: 'Conditioning / Fitness', subtypes: ['Suicides (line sprints)', 'Full-court runs', 'Shuttle runs', 'Jump training', 'Core workouts', 'Endurance drills'] },
   { name: 'Rebounding', subtypes: ['Box out drills', 'Offensive rebounding', 'Defensive rebounding', 'Timing & jumping drills'] },
-  { name: 'Game Situations', subtypes: ['1v1', '2v2 / 3v3', 'Fast break drills', 'Pick & roll', 'End-of-game situations', 'Transition offense/defense'] },
+  { name: 'Game Situations', subtypes: ['1v1', '2v2', '3v3', 'Fast break drills', 'Pick & roll', 'End-of-game situations', 'Transition offense/defense'] },
   { name: 'Ball Handling & Decision Making', subtypes: ['Pressure dribbling', 'Read & react drills', 'Double team escape', 'Combo moves + finish'] },
 ];
 
@@ -38,6 +38,7 @@ export default function AdminExerciseTypesPage() {
   const [subtypes, setSubtypes] = useState<ExerciseSubtype[]>([]);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+  const [reseedConfirmOpen, setReseedConfirmOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const [dialog, setDialog] = useState<{
@@ -73,9 +74,19 @@ export default function AdminExerciseTypesPage() {
     setSnackbar({ open: true, message, severity });
   }
 
-  async function handleSeed() {
+  async function handleSeed(reset = false) {
     setSeeding(true);
+    setReseedConfirmOpen(false);
     try {
+      if (reset) {
+        const [existingTypes, existingSubtypes] = await Promise.all([
+          getExerciseTypes(), getExerciseSubtypes(),
+        ]);
+        await Promise.all([
+          ...existingTypes.map((t) => deleteExerciseType(t.id)),
+          ...existingSubtypes.map((s) => deleteExerciseSubtype(s.id)),
+        ]);
+      }
       for (const { name, subtypes: subs } of SEED_DATA) {
         const typeId = await createExerciseType(name);
         for (const subName of subs) {
@@ -141,6 +152,18 @@ export default function AdminExerciseTypesPage() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h5">Exercise Types</Typography>
+        {types.length > 0 && !loading && (
+          <Button
+            variant="outlined"
+            size="small"
+            color="warning"
+            startIcon={seeding ? <CircularProgress size={14} color="inherit" /> : <AutoAwesomeIcon fontSize="small" />}
+            onClick={() => setReseedConfirmOpen(true)}
+            disabled={seeding}
+          >
+            {seeding ? 'Reseeding…' : 'Reset & Reseed'}
+          </Button>
+        )}
       </Box>
 
       {loading ? (
@@ -265,6 +288,18 @@ export default function AdminExerciseTypesPage() {
         <DialogActions>
           <Button onClick={() => setDialog((d) => ({ ...d, open: false }))}>Cancel</Button>
           <Button variant="contained" onClick={() => void handleSave()} disabled={!dialog.name.trim()}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reset & Reseed confirmation */}
+      <Dialog open={reseedConfirmOpen} onClose={() => setReseedConfirmOpen(false)}>
+        <DialogTitle>Reset & Reseed Types?</DialogTitle>
+        <DialogContent>
+          <Typography>This will delete all existing types and subtypes and replace them with the defaults. This cannot be undone.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setReseedConfirmOpen(false)}>Cancel</Button>
+          <Button variant="contained" color="warning" onClick={() => void handleSeed(true)}>Reset & Reseed</Button>
         </DialogActions>
       </Dialog>
 
