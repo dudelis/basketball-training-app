@@ -26,7 +26,7 @@ type Props = {
   children: ReactNode;
 };
 
-const NAV_ITEMS = [
+const TRAINEE_NAV_ITEMS = [
   { label: 'Dashboard', icon: <HomeIcon />, path: '/dashboard' },
   { label: 'Exercises', icon: <FitnessCenterIcon />, path: '/exercises' },
   { label: 'Plans', icon: <ListAltIcon />, path: '/plans' },
@@ -34,11 +34,13 @@ const NAV_ITEMS = [
   { label: 'History', icon: <HistoryIcon />, path: '/history' },
 ];
 
-const ADMIN_NAV_ITEM = {
-  label: 'Admin',
-  icon: <AdminPanelSettingsIcon />,
-  path: '/admin',
-};
+const ADMIN_NAV_ITEMS = [
+  { label: 'Dashboard', icon: <HomeIcon />, path: '/dashboard' },
+  { label: 'Exercises', icon: <FitnessCenterIcon />, path: '/exercises' },
+  { label: 'Plans', icon: <ListAltIcon />, path: '/plans' },
+  { label: 'History', icon: <HistoryIcon />, path: '/history' },
+  { label: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
+];
 
 export default function AppLayout({ children }: Props) {
   const { user, firebaseUser } = useAuthContext();
@@ -46,7 +48,7 @@ export default function AppLayout({ children }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navItems = user?.role === 'admin' ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
+  const navItems = user?.role === 'admin' ? ADMIN_NAV_ITEMS : TRAINEE_NAV_ITEMS;
 
   const currentNavIndex = navItems.findIndex((item) =>
     location.pathname.startsWith(item.path)

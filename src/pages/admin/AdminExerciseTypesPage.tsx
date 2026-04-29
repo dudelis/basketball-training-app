@@ -11,6 +11,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import {
   getExerciseTypes, createExerciseType, updateExerciseType, deleteExerciseType,
 } from '../../services/exerciseTypes';
@@ -140,11 +141,6 @@ export default function AdminExerciseTypesPage() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h5">Exercise Types</Typography>
-        {types.length === 0 && !loading && (
-          <Button variant="outlined" size="small" onClick={() => void handleSeed()} disabled={seeding}>
-            {seeding ? 'Seeding…' : 'Seed Default Types'}
-          </Button>
-        )}
       </Box>
 
       {loading ? (
@@ -227,9 +223,21 @@ export default function AdminExerciseTypesPage() {
             );
           })}
           {types.length === 0 && (
-            <Typography variant="body2" color="text.secondary">
-              No exercise types yet. Use "Seed Default Types" or add one manually.
-            </Typography>
+            <Box sx={{ textAlign: 'center', py: 6 }}>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                No exercise types yet. Seed the default basketball types or add one manually.
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={seeding ? <CircularProgress size={18} color="inherit" /> : <AutoAwesomeIcon />}
+                onClick={() => void handleSeed()}
+                disabled={seeding}
+                sx={{ borderRadius: 3, px: 4 }}
+              >
+                {seeding ? 'Seeding…' : 'Seed Default Types'}
+              </Button>
+            </Box>
           )}
         </List>
       )}
